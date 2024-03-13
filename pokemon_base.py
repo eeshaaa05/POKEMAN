@@ -4,6 +4,7 @@ This module contains PokeType, TypeEffectiveness and an abstract version of the 
 from abc import ABC
 from enum import Enum
 from data_structures.referential_array import ArrayR
+import csv
 
 class PokeType(Enum):
     """
@@ -30,6 +31,15 @@ class TypeEffectiveness:
     Represents the type effectiveness of one Pokemon type against another.
     """
 
+    EFFECT_TABLE = {}
+
+    @classmethod
+    def populate_effect_table(cls):
+        with open('type_effectiveness.csv', 'r') as file:
+            reader = csv.reader(file)
+            for row in reader:
+                cls.EFFECT_TABLE[PokeType[row[0]]] = (PokeType[header]: float(value) for header, value in zip(reader.fieldnames[1:], row[1:])}
+
     @classmethod
     def get_effectiveness(cls, attack_type: PokeType, defend_type: PokeType) -> float:
         """
@@ -42,13 +52,15 @@ class TypeEffectiveness:
         Returns:
             float: The effectiveness of the attack, as a float value between 0 and 4.
         """
-        raise NotImplementedError
+        if not cls.EFFECT_TABLE:
+            cls.populate_effect_table()
+        return cls.EFFECT_TABLE[attack_type][defend_type]
 
     def __len__(self) -> int:
         """
         Returns the number of types of Pokemon
         """
-        raise NotImplementedError
+        return lem(PokeType)
 
 
 class Pokemon(ABC): # pylint: disable=too-few-public-methods, too-many-instance-attributes
@@ -189,7 +201,12 @@ class Pokemon(ABC): # pylint: disable=too-few-public-methods, too-many-instance-
         Evolves the Pokemon to the next stage in its evolution line, and updates
           its attributes accordingly.
         """
-        raise NotImplementedError
+        if len(self.evolution_line) > 1:
+            self.name = self.evolution_line[self.evolution_line.index(self.name) + 1]
+            self.battle_power *= 1.5
+            self.health *= 1.5
+            self.speed *= 1.5
+            self.defence *= 1.5
 
     def is_alive(self) -> bool:
         """
