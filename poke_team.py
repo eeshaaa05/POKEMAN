@@ -42,6 +42,13 @@ class PokeTeam:
         else:
             raise ValueError("Invalid battle mode.")
 
+    def assemble_team(self, battle_mode, criterion=None):
+        self.regenerate_team(battle_mode, criterion)
+
+    def special(self, battle_mode:str) -> None:
+        if battle_mode == "SET":
+            #Reverse the fir
+
     def __getitem__(self, index: int):
         return self.team[index]
 
